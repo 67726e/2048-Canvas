@@ -664,12 +664,33 @@
 				grid.tiles[firstTile.x][firstTile.y] = firstTile;
 				var secondTile = randomTile(grid);
 				grid.tiles[secondTile.x][secondTile.y] = secondTile;
+			},
+			hasLost: function(grid) {
+				return (!Movement.canMove("UP", grid) && !Movement.canMove("DOWN", grid) && !Movement.canMove("LEFT", grid) &&
+					!Movement.canMove("RIGHT", grid));
+			},
+			hasWon: function(grid) {
+				for (var x = 0; x < grid.width; x++) {
+					for (var y = 0; y < grid.height; y++) {
+						if (!!grid.tiles[x][y] && grid.tiles[x][y].value === grid.winningValue) {
+							return true;
+						}
+					}
+				}
+
+				return false;
 			}
 		};
 
 		return {
 			reset: function(grid) {
 				Game.reset(grid);
+			},
+			hasLost: function(grid) {
+				return Game.hasLost(grid);
+			},
+			hasWon: function(grid) {
+				return Game.hasWon(grid);
 			}
 		};
 	})();
@@ -715,28 +736,6 @@
 			y: emptyCells[row][column]
 		};
 	};
-
-
-
-
-
-	var hasWon = function(grid) {
-		for (var x = 0; x < grid.width; x++) {
-			for (var y = 0; y < grid.height; y++) {
-				if (!!grid.tiles[x][y] && grid.tiles[x][y].value === grid.winningValue) {
-					return true;
-				}
-			}
-		}
-
-		return false;
-	};
-
-	var hasLost = function(grid) {
-		return (!Movement.canMove("UP", grid) && !Movement.canMove("DOWN", grid) && !Movement.canMove("LEFT", grid) &&
-			!Movement.canMove("RIGHT", grid));
-	};
-
 
 
 
@@ -787,10 +786,10 @@
 			Renderer.render(canvas, context, grid);
 
 			// Check if we need to continue playing
-			if (hasWon(grid)) {
+			if (Game.hasWon(grid)) {
 				// Draw the game won screen
 				Renderer.showGameWon(canvas, context);
-			} else if (hasLost(grid)) {
+			} else if (Game.hasLost(grid)) {
 				// Draw game over screen
 				Renderer.showGameOver(canvas, context);
 			} else {
