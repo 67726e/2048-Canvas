@@ -67,26 +67,29 @@
 
 			animateGrowth: function(canvas, context, tile) {
 				var MODIFIER = { GROW: "GROW", SHRINK: "SHRINK" };
-				var GROWTH_RATE = 5;
-				var MAX_SIZE = 15;
-				var MIN_SIZE = 0;
 
 				if (tile.growing === undefined) {
 					// If we are not yet animating, setup the data
-					tile.growing = { modifier: MODIFIER.GROW, value: GROWTH_RATE };
+					tile.growing = {
+						modifier: MODIFIER.GROW,
+						rate: 5,
+						value: 5,
+						maxSize: 15,
+						minSize: 0
+					};
 				} else if (tile.growing.modifier === MODIFIER.GROW) {
 					// Increase the growth size by 1
-					tile.growing.value += GROWTH_RATE;
+					tile.growing.value += tile.growing.rate;
 
 					// If we've reached the max growth, start shrinking
-					if (tile.growing.value >= MAX_SIZE) {
+					if (tile.growing.value >= tile.growing.maxSize) {
 						tile.growing.modifier = MODIFIER.SHRINK;
 					}
 				} else if (tile.growing.modifier === MODIFIER.SHRINK) {
-					tile.growing.value -= GROWTH_RATE;
+					tile.growing.value -= tile.growing.rate;
 
 					// If we've shrunk back to normal, remove animation data
-					if (tile.growing.value <= MIN_SIZE) {
+					if (tile.growing.value <= tile.growing.minSize) {
 						// Remove the trigger value
 						delete tile.triggerGrowth;
 						delete tile.growing;
@@ -773,7 +776,15 @@
 			value: Math.ceil(Math.random() * 2) * 2,
 			// Starting random coordinates within the grid
 			x: row,
-			y: emptyCells[row][column]
+			y: emptyCells[row][column],
+			triggerGrowth: true,
+			growing: {
+				modifier: "GROW",
+				rate: 5,
+				value: -25,
+				maxSize: 0,
+				minSize: 0
+			}
 		};
 	};
 
