@@ -319,12 +319,16 @@
 				}
 			},
 			getCellCoordinates: function(grid, cellWidth, cellHeight, row, column) {
-			// Convert the row/column number into x/y coordinates on the actual canvas
-			return {
-				x: (row * cellWidth) + ((row + 1) * grid.border),
-				y: (column * cellHeight) + ((column + 1) * grid.border)
-			};
-		}
+				// For some reason, row/column are sometimes a string which fucks the calculations
+				row = parseInt(row, 10);
+				column = parseInt(column, 10);
+
+				// Convert the row/column number into x/y coordinates on the actual canvas
+				return {
+					x: (row * cellWidth) + ((row + 1) * grid.border),
+					y: (column * cellHeight) + ((column + 1) * grid.border)
+				};
+			}
 		};
 
 		// Public interface
