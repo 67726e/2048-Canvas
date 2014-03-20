@@ -40,6 +40,7 @@
 				for (var x = 0; x < grid.width; x++) {
 					for (var y = 0; y < grid.height; y++) {
 						var tile = grid.tiles[x][y];
+						var mergedTile = grid.mergedTiles[x][y];
 
 						if (!!tile) {
 							if (tile.triggerGrowth || !!tile.growing) {
@@ -48,6 +49,13 @@
 
 							if (tile.triggerSlide || !!tile.sliding) {
 								this.animateSliding(canvas, context, tile);
+								blockInput = true;
+							}
+						}
+
+						if (!!mergedTile) {
+							if (mergedTile.triggerSlide || !!mergedTile.sliding) {
+								this.animateSliding(canvas, context, mergedTile);
 								blockInput = true;
 							}
 						}
@@ -146,7 +154,6 @@
 			"2048": "#f9f6f2"
 		};
 
-
 		var Renderer = {
 			render: function(canvas, context, grid) {
 				// Draw the background
@@ -159,6 +166,8 @@
 				// Draw the empty cells
 				this.drawCells(context, grid, cellWidth, cellHeight);
 
+				// Draw the merged tiles that are still animating
+				this.drawMergedTiles(context, grid, cellWidth, cellHeight);
 				// Draw tiles in their proper cells
 				this.drawTiles(context, grid, cellWidth, cellHeight);
 			},
@@ -265,13 +274,13 @@
 				}
 
 				// Handle growth animation
-//				if (!!tile.growing) {
-//					var growth = (!!tile.growing && !tile.sliding) ? tile.growing.value : 0;
-//					x -= (growth / 2);
-//					y -= (growth / 2);
-//					width += growth;
-//					height += growth;
-//				}
+				if (!!tile.growing) {
+					var growth = (!!tile.growing && !tile.sliding) ? tile.growing.value : 0;
+					x -= (growth / 2);
+					y -= (growth / 2);
+					width += growth;
+					height += growth;
+				}
 
 				// Fill in the cell with the proper background color
 				context.fillStyle = BACKGROUND_COLOR[tile.value];
@@ -287,6 +296,24 @@
 				context.textBaseline = "middle";
 				context.fillStyle = FONT_COLOR[tile.value];
 				context.fillText(tile.value, textX, textY, width);
+			},
+			drawMergedTiles: function(context, grid, cellWidth, cellHeight) {
+				// Iterate over the merged tiles and draw them on screen
+				for (var x = 0; x < grid.width; x++) {
+					for (var y = 0; y < grid.height; y++) {
+						if (!!grid.mergedTiles[x][y]) {
+							var tile = grid.mergedTiles[x][y];
+							var coordinates = this.getCellCoordinates(grid, cellWidth, cellHeight, tile.slidingData.endX,
+								tile.slidingData.endY);
+							this.drawTile(context, grid, tile, coordinates, cellWidth, cellHeight);
+
+							// If the tile is done sliding, remove it from the merged tile grid
+							if (!tile.sliding) {
+								grid.mergedTiles[x][y] = undefined;
+							}
+						}
+					}
+				}
 			},
 			getCellCoordinates: function(grid, cellWidth, cellHeight, row, column) {
 			// Convert the row/column number into x/y coordinates on the actual canvas
@@ -458,7 +485,7 @@
 									var bottomTileIndex = getBottomTile(grid.tiles[x], y);
 
 									Movement.attemptMove(grid, "UP", x, y, x, topCellIndex);
-									Movement.attemptMerge(grid, x, currentTile.y, x, bottomTileIndex);
+									Movement.attemptMerge(grid, "UP", x, currentTile.y, x, bottomTileIndex);
 								}
 							}
 						}
@@ -497,7 +524,7 @@
 									var topTileIndex = getTopTile(grid.tiles[x], y);
 
 									Movement.attemptMove(grid, "DOWN", x, y, x, bottomCellIndex);
-									Movement.attemptMerge(grid, x, currentTile.y, x, topTileIndex);
+									Movement.attemptMerge(grid, "DOWN", x, currentTile.y, x, topTileIndex);
 								}
 							}
 						}
@@ -536,7 +563,7 @@
 									var rightTileIndex = getRightTile(grid, x, y);
 
 									Movement.attemptMove(grid, "LEFT", x, y, leftCellIndex, y);
-									Movement.attemptMerge(grid, currentTile.x, y, rightTileIndex, y);
+									Movement.attemptMerge(grid, "LEFT", currentTile.x, y, rightTileIndex, y);
 								}
 							}
 						}
@@ -575,7 +602,7 @@
 									var leftTileIndex = getLeftTile(grid, x, y);
 
 									Movement.attemptMove(grid, "RIGHT", x, y, rightCellIndex, y);
-									Movement.attemptMerge(grid, currentTile.x, y, leftTileIndex, y);
+									Movement.attemptMerge(grid, "RIGHT", currentTile.x, y, leftTileIndex, y);
 								}
 							}
 						}
@@ -588,6 +615,20 @@
 				};
 			})(),
 
+			setupSlide: function(grid, direction, startX, startY, endX, endY) {
+				var tile = grid.tiles[startX][startY];
+
+				tile.sliding = { value: 0 };
+				tile.triggerSlide = true;
+				tile.slidingData = {
+					direction: direction,
+					startX: startX,
+					startY: startY,
+					endX: endX,
+					endY: endY
+				};
+			},
+
 			attemptMove: function(grid, direction, currentX, currentY, newX, newY) {
 				if (isFinite(currentX) && isFinite(currentY) && isFinite(newX) && isFinite(newY)) {
 					if (currentX !== newX || currentY !== newY) {
@@ -595,19 +636,11 @@
 						currentTile.x = newX;
 						currentTile.y = newY;
 
+						// Setup data needed for slide animation
+						this.setupSlide(grid, direction, currentX, currentY, newX, newY);
+
 						grid.tiles[newX][newY] = currentTile;
 						grid.tiles[currentX][currentY] = undefined;
-
-						// Setup data needed for slide animation
-						currentTile.sliding = { value: 0 };
-						currentTile.triggerSlide = true;
-						currentTile.slidingData = {
-							direction: direction,
-							startX: currentX,
-							startY: currentY,
-							endX: newX,
-							endY: newY
-						};
 
 						return true;
 					}
@@ -615,15 +648,19 @@
 
 				return false;
 			},
-			attemptMerge: function(grid, currentX, currentY, neighborX, neighborY) {
+			attemptMerge: function(grid, direction, currentX, currentY, neighborX, neighborY) {
 				if (isFinite(currentX) && isFinite(currentY) && isFinite(neighborX) && isFinite(neighborY)) {
 					if (grid.tiles[currentX][currentY].value === grid.tiles[neighborX][neighborY].value) {
 						// Double the value of the current cell
 						grid.tiles[currentX][currentY].value *= 2;
-						// Erase the neighboring cell from the map
-						grid.tiles[neighborX][neighborY] = undefined;
 						// Set growth animation flag for merged tile
 						grid.tiles[currentX][currentY].triggerGrowth = true;
+
+						// Setup the merged cell for the slide animation
+						this.setupSlide(grid, direction, neighborX, neighborY, currentX, currentY);
+						grid.mergedTiles[neighborX][neighborY] = grid.tiles[neighborX][neighborY];
+						// Erase the neighboring cell from the map
+						grid.tiles[neighborX][neighborY] = undefined;
 
 						return true;
 					}
@@ -649,13 +686,16 @@
 			reset: function(grid) {
 				// Create new set of tiles
 				grid.tiles = [];
+				grid.mergedTiles = [];
 
 				// Fill the set of tiles as empty
 				for (var x = 0; x < grid.width; x++) {
 					grid.tiles[x] = [];
+					grid.mergedTiles[x] = [];
 
 					for (var y = 0; y < grid.height; y++) {
 						grid.tiles[x][y] = undefined;
+						grid.mergedTiles[x][y] = undefined;
 					}
 				}
 
@@ -749,12 +789,14 @@
 		var grid = {
 			// column x row
 			tiles: [],
+			// Used for tiles that are merged but need to be animated
+			mergedTiles: [],
 			width: 4,
 			height: 4,
 			border: 15,
 			winningValue: 2048
 		};
-
+window.grid = grid;
 		// Initialize game data
 		Game.reset(grid);
 
