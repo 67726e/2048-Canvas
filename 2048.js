@@ -179,7 +179,7 @@
 
 				// Draw "Game Over!" text
 				// TODO: Reevaluate font size/style
-				context.font = "40px Helvetica";
+				context.font = "40px Helvetica Neue";
 				context.textAlign = "center";
 				context.textBaseline = "middle";
 				context.fillStyle = "#776e65";
@@ -190,7 +190,7 @@
 
 				// Draw "Game Won!" message
 				// TODO: Reevaluate font size/style
-				context.font = "40px Helvetica";
+				context.font = "40px Helvetica Neue";
 				context.textAlign = "center";
 				context.textBaseline = "middle";
 				context.fillStyle = "#776e65";
@@ -292,9 +292,7 @@
 				// Draw the tile value in the center of the cell
 				var textX = x + (width / 2);
 				var textY = y + (height / 2);
-				// TODO: Reevaluate calculation of font size
-				// TODO: Reevaluate font choice
-				context.font = "40px Helvetica";
+				context.font = "bold " + Math.floor(Math.min(width, height) / 1.94) + "px Helvetica Neue";
 				context.textAlign = "center";
 				context.textBaseline = "middle";
 				context.fillStyle = FONT_COLOR[tile.value];
