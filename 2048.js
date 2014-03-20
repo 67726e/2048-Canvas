@@ -332,11 +332,10 @@
 							break;
 					}
 
-					if (action(grid)) {
-						var tile = randomTile(grid);
-						grid.tiles[tile.x][tile.y] = tile;
-					}
+					return action(grid);
 				}
+
+				return false;
 			},
 			canMove: function(direction, grid) {
 				switch (direction) {
@@ -760,6 +759,9 @@
 		// Initialize game data
 		Game.reset(grid);
 
+		// Determine if we need a random tile on the next input
+		var insertTile = false;
+
 		// Setup the render loop
 		(function mainLoop() {
 			// Handle calculations for animations
@@ -767,7 +769,18 @@
 
 			// Handle the user input
 			if (!blockInput) {
-				Movement.move(Input.getCommand(), grid);
+				// Insert a new random tile if needed
+				if (insertTile) {
+					var tile = randomTile(grid);
+					grid.tiles[tile.x][tile.y] = tile;
+					insertTile = false;
+				} else {
+					// Allow the user to move tiles
+					if (Movement.move(Input.getCommand(), grid)) {
+						// If we've moved successfully, set a new tile for insertion
+						insertTile = true;
+					}
+				}
 			}
 
 			// Draw the game screen
