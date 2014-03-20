@@ -250,7 +250,7 @@
 						x = startCoordinates.x - value;
 						x = (x <= stopCoordinates.x) ? stopCoordinates.x : x;
 					} else if (direction === "RIGHT") {
-						x = startCoordinates.y + value;
+						x = startCoordinates.x + value;
 						x = (x >= stopCoordinates.x) ? stopCoordinates.x : x;
 					}
 
@@ -265,13 +265,13 @@
 				}
 
 				// Handle growth animation
-				if (!!tile.growing) {
-					var growth = (!!tile.growing && !tile.sliding) ? tile.growing.value : 0;
-					x -= (growth / 2);
-					y -= (growth / 2);
-					width += growth;
-					height += growth;
-				}
+//				if (!!tile.growing) {
+//					var growth = (!!tile.growing && !tile.sliding) ? tile.growing.value : 0;
+//					x -= (growth / 2);
+//					y -= (growth / 2);
+//					width += growth;
+//					height += growth;
+//				}
 
 				// Fill in the cell with the proper background color
 				context.fillStyle = BACKGROUND_COLOR[tile.value];
