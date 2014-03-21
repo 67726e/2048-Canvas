@@ -5,6 +5,45 @@
 	// TODO: Change animation calculations to include time for non-janky animation
 	// TODO: Make tile font-box slightly smaller than the tile width
 
+	var Metrics = (function() {
+		var PIXEL_RATIO = (function () {
+			//noinspection JSUnresolvedVariable
+			var ctx = document.createElement("canvas").getContext("2d"),
+				dpr = window.devicePixelRatio || 1,
+				bsr = ctx.webkitBackingStorePixelRatio ||
+					ctx.mozBackingStorePixelRatio ||
+					ctx.msBackingStorePixelRatio ||
+					ctx.oBackingStorePixelRatio ||
+					ctx.backingStorePixelRatio || 1;
+
+			return dpr / bsr;
+		})();
+		var body = document.getElementById("body");
+
+		var Metrics = {
+			getPixelRatio: function() {
+				return PIXEL_RATIO;
+			},
+			getSize: function() {
+				var e = document.documentElement,
+					width = window.innerWidth || e.clientWidth || body.clientWidth,
+					height = window.innerHeight|| e.clientHeight|| body.clientHeight;
+
+				return Math.min(width, height);
+			}
+		};
+
+		// public interface
+		return {
+			getPixelRatio: function() {
+				return Metrics.getPixelRatio();
+			},
+			getSize: function() {
+				return Metrics.getSize();
+			}
+		};
+	})();
+
 	var Input = (function() {
 		// Log key presses
 		var KEY_TO_COMMAND = {
@@ -823,8 +862,23 @@
 
 	// Initialize game and controls
 	(function() {
-		var canvas = document.getElementById("canvas");
+		// Pixel Density for Devices - http://stackoverflow.com/a/15666143/372743
+		var pixelRatio = Metrics.getPixelRatio();
+		var size = Metrics.getSize();
+
+		var body = document.getElementById("body");
+		var canvas = document.createElement("canvas");
 		var context = canvas.getContext("2d");
+
+		canvas.width = size * pixelRatio;
+		canvas.height = size * pixelRatio;
+		canvas.style.width = (size + "px");
+		canvas.style.height = (size + "px");
+
+		// Seems to fuck up the iOS UIWebView by splitting the quartering the canvas
+//		context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+
+		body.appendChild(canvas);
 
 		// tile: {value: 2, x: 0, y: 0} - Includes value and coordinates (redundant, but error correcting)
 		var grid = {
