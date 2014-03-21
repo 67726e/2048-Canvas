@@ -175,26 +175,28 @@
 				this.drawTiles(context, grid, cellWidth, cellHeight);
 			},
 			showGameOver: function(canvas, context) {
-				this.showOverlay(canvas, context);
+				this.showOverlay(canvas, context, "rgba(238, 228, 218, 0.5)");
 
 				// Draw "Game Over!" text
-				// TODO: Reevaluate font size/style
-				context.font = "40px Helvetica Neue";
+				context.font = "bold " + Math.floor(Math.min(canvas.width, canvas.height) / 8.33) + "px Helvetica Neue";
 				context.textAlign = "center";
 				context.textBaseline = "middle";
 				context.fillStyle = "#776e65";
 				context.fillText("Game Over!", (canvas.width / 2), (canvas.height / 2), canvas.width);
+
+				// TODO: Draw "Try again" button
 			},
 			showGameWon: function(canvas, context) {
-				this.showOverlay(canvas, context);
+				this.showOverlay(canvas, context, "rgba(237, 194, 46, 0.5)");
 
 				// Draw "Game Won!" message
-				// TODO: Reevaluate font size/style
-				context.font = "40px Helvetica Neue";
+				context.font = "bold " + Math.floor(Math.min(canvas.width, canvas.height) / 8.33) + "px Helvetica Neue";
 				context.textAlign = "center";
 				context.textBaseline = "middle";
-				context.fillStyle = "#776e65";
-				context.fillText("Game Won!", (canvas.width / 2), (canvas.height / 2), canvas.width);
+				context.fillStyle = "#f9f6f2";
+				context.fillText("You win!", (canvas.width / 2), (canvas.height / 2), canvas.width);
+
+				// TODO: Add "Try Again" button
 			},
 
 			roundedRectangle: function(context, x, y, width, height, radius) {
@@ -213,9 +215,9 @@
 				context.fill();
 				context.closePath();
 			},
-			showOverlay: function(canvas, context) {
+			showOverlay: function(canvas, context, fill) {
 				// Draw semi-transparent background over the entire grid
-				context.fillStyle = "rgba(238, 228, 218, 0.5)";
+				context.fillStyle = fill;
 				context.fillRect(0, 0, canvas.width, canvas.height);
 			},
 			drawCells: function(context, grid, cellWidth, cellHeight) {
