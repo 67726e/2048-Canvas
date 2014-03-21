@@ -488,6 +488,8 @@
 
 				return function(grid) {
 					if (Movement.canMoveUp(grid)) {
+						var score = { score: 0 };
+
 						for (var x = 0; x < grid.width; x++) {
 							for (var y = 0; y < grid.height; y++) {
 								if (!!grid.tiles[x][y]) {
@@ -496,13 +498,16 @@
 									var bottomTileIndex = getBottomTile(grid.tiles[x], y);
 
 									Movement.attemptMove(grid, "UP", x, y, x, topCellIndex);
-									Movement.attemptMerge(grid, "UP", x, currentTile.y, x, bottomTileIndex);
+									var mergeScore = Movement.attemptMerge(grid, "UP", x, currentTile.y, x, bottomTileIndex);
+
+									if (!!mergeScore && isFinite(mergeScore.score)) {
+										score.score += mergeScore.score;
+									}
 								}
 							}
 						}
 
-						// TODO: Eventually, return object containing combination count
-						return true;
+						return score;
 					}
 
 					return false;
@@ -527,6 +532,8 @@
 
 				return function(grid) {
 					if (Movement.canMoveDown(grid)) {
+						var score = { score: 0 };
+
 						for (var x = 0; x < grid.width; x++) {
 							for (var y = (grid.height - 1); y >= 0; y--) {
 								if (!!grid.tiles[x][y]) {
@@ -535,13 +542,16 @@
 									var topTileIndex = getTopTile(grid.tiles[x], y);
 
 									Movement.attemptMove(grid, "DOWN", x, y, x, bottomCellIndex);
-									Movement.attemptMerge(grid, "DOWN", x, currentTile.y, x, topTileIndex);
+									var mergeScore = Movement.attemptMerge(grid, "DOWN", x, currentTile.y, x, topTileIndex);
+
+									if (!!mergeScore && isFinite(mergeScore.score)) {
+										score.score += mergeScore.score;
+									}
 								}
 							}
 						}
 
-						// TODO: Eventually, return object containing combination count
-						return true;
+						return score;
 					}
 
 					return false;
@@ -566,6 +576,8 @@
 
 				return function(grid) {
 					if (Movement.canMoveLeft(grid)) {
+						var score = { score: 0 };
+
 						for (var y = 0; y < grid.height; y++) {
 							for (var x = 0; x < grid.width; x++) {
 								if (!!grid.tiles[x][y]) {
@@ -574,13 +586,16 @@
 									var rightTileIndex = getRightTile(grid, x, y);
 
 									Movement.attemptMove(grid, "LEFT", x, y, leftCellIndex, y);
-									Movement.attemptMerge(grid, "LEFT", currentTile.x, y, rightTileIndex, y);
+									var mergeScore = Movement.attemptMerge(grid, "LEFT", currentTile.x, y, rightTileIndex, y);
+
+									if (!!mergeScore && isFinite(mergeScore.score)) {
+										score.score += mergeScore.score;
+									}
 								}
 							}
 						}
 
-						// TODO: Eventually, return object containing combination count
-						return true;
+						return score;
 					}
 
 					return false;
@@ -605,6 +620,8 @@
 
 				return function(grid) {
 					if (Movement.canMoveRight(grid)) {
+						var score = { score: 0 };
+
 						for (var y = 0; y < grid.height; y++) {
 							for (var x = (grid.width - 1); x >= 0; x--) {
 								if (!!grid.tiles[x][y]) {
@@ -613,13 +630,16 @@
 									var leftTileIndex = getLeftTile(grid, x, y);
 
 									Movement.attemptMove(grid, "RIGHT", x, y, rightCellIndex, y);
-									Movement.attemptMerge(grid, "RIGHT", currentTile.x, y, leftTileIndex, y);
+									var mergeScore = Movement.attemptMerge(grid, "RIGHT", currentTile.x, y, leftTileIndex, y);
+
+									if (!!mergeScore && isFinite(mergeScore.score)) {
+										score.score += mergeScore.score;
+									}
 								}
 							}
 						}
 
-						// TODO: Eventually, return object containing combination count
-						return true;
+						return score;
 					}
 
 					return false;
@@ -673,7 +693,7 @@
 						// Erase the neighboring cell from the map
 						grid.tiles[neighborX][neighborY] = undefined;
 
-						return true;
+						return { score: grid.tiles[currentX][currentY].value };
 					}
 				}
 
@@ -695,6 +715,8 @@
 	var Game = (function() {
 		var Game = {
 			reset: function(grid) {
+				// Set the score
+				grid.score = 0;
 				// Create new set of tiles
 				grid.tiles = [];
 				grid.mergedTiles = [];
@@ -813,9 +835,10 @@
 			width: 4,
 			height: 4,
 			border: 15,
-			winningValue: 2048
+			winningValue: 2048,
+			score: 0
 		};
-window.grid = grid;
+
 		// Initialize game data
 		Game.reset(grid);
 
@@ -831,12 +854,15 @@ window.grid = grid;
 			if (!blockInput) {
 				// Insert a new random tile if needed
 				if (insertTile) {
+					insertTile = false;
 					var tile = randomTile(grid);
 					grid.tiles[tile.x][tile.y] = tile;
-					insertTile = false;
 				} else {
 					// Allow the user to move tiles
-					if (Movement.move(Input.getCommand(), grid)) {
+					var score = Movement.move(Input.getCommand(), grid);
+					if (!!score) {
+						// Update the score
+						grid.score += score.score;
 						// If we've moved successfully, set a new tile for insertion
 						insertTile = true;
 					}
