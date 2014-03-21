@@ -1,6 +1,10 @@
 (function() {
 	"use strict";
 
+	// TODO: Export all font/pixel calculations into a `metrics` module
+	// TODO: Change animation calculations to include time for non-janky animation
+	// TODO: Make tile font-box slightly smaller than the tile width
+
 	var Input = (function() {
 		// Log key presses
 		var KEY_TO_COMMAND = {
