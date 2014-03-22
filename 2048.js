@@ -1,7 +1,6 @@
 (function() {
 	"use strict";
 
-	// TODO: Export all font/pixel calculations into a `metrics` module
 	// TODO: Change animation calculations to include time for non-janky animation
 	// TODO: Make tile font-box slightly smaller than the tile width
 
@@ -30,6 +29,18 @@
 					height = window.innerHeight|| e.clientHeight|| body.clientHeight;
 
 				return Math.min(width, height);
+			},
+			getSlideSpeed: function() {
+				return this.getSize() / 25;
+			},
+			getGrowthSpeed: function() {
+				return this.getSize() / 100;
+			},
+			getHeaderSize: function() {
+				return Math.floor(this.getSize() / 8.33);
+			},
+			getTileSize: function(width, height) {
+				return Math.floor(Math.min(width, height) / 1.94);
 			}
 		};
 
@@ -40,6 +51,18 @@
 			},
 			getSize: function() {
 				return Metrics.getSize();
+			},
+			getSlideSpeed: function() {
+				return Metrics.getSlideSpeed();
+			},
+			getGrowthSpeed: function() {
+				return Metrics.getGrowthSpeed();
+			},
+			getHeaderSize: function() {
+				return Metrics.getHeaderSize();
+			},
+			getTileSize: function(width, height) {
+				return Metrics.getTileSize(width, height);
 			}
 		};
 	})();
@@ -110,26 +133,26 @@
 
 			animateGrowth: function(canvas, context, tile) {
 				var MODIFIER = { GROW: "GROW", SHRINK: "SHRINK" };
+				var GROWTH_SPEED = Metrics.getGrowthSpeed();
 
 				if (tile.growing === undefined) {
 					// If we are not yet animating, setup the data
 					tile.growing = {
 						modifier: MODIFIER.GROW,
-						rate: 5,
-						value: 5,
+						value: GROWTH_SPEED,
 						maxSize: 15,
 						minSize: 0
 					};
 				} else if (tile.growing.modifier === MODIFIER.GROW) {
-					// Increase the growth size by 1
-					tile.growing.value += tile.growing.rate;
+					// Increase the growth size
+					tile.growing.value += GROWTH_SPEED;
 
 					// If we've reached the max growth, start shrinking
 					if (tile.growing.value >= tile.growing.maxSize) {
 						tile.growing.modifier = MODIFIER.SHRINK;
 					}
 				} else if (tile.growing.modifier === MODIFIER.SHRINK) {
-					tile.growing.value -= tile.growing.rate;
+					tile.growing.value -= GROWTH_SPEED;
 
 					// If we've shrunk back to normal, remove animation data
 					if (tile.growing.value <= tile.growing.minSize) {
@@ -140,7 +163,7 @@
 				}
 			},
 			animateSliding: function(canvas, context, tile) {
-				var SLIDE_RATE = 10;
+				var SLIDE_RATE = Metrics.getSlideSpeed();
 
 				if (tile.sliding === undefined) {
 					tile.sliding = { value: 0 };
@@ -221,7 +244,7 @@
 				this.showOverlay(canvas, context, "rgba(238, 228, 218, 0.5)");
 
 				// Draw "Game Over!" text
-				context.font = "bold " + Math.floor(Math.min(canvas.width, canvas.height) / 8.33) + "px Helvetica Neue";
+				context.font = "bold " + Metrics.getHeaderSize() + "px Helvetica Neue";
 				context.textAlign = "center";
 				context.textBaseline = "middle";
 				context.fillStyle = "#776e65";
@@ -233,7 +256,7 @@
 				this.showOverlay(canvas, context, "rgba(237, 194, 46, 0.5)");
 
 				// Draw "Game Won!" message
-				context.font = "bold " + Math.floor(Math.min(canvas.width, canvas.height) / 8.33) + "px Helvetica Neue";
+				context.font = "bold " + Metrics.getHeaderSize() + "px Helvetica Neue";
 				context.textAlign = "center";
 				context.textBaseline = "middle";
 				context.fillStyle = "#f9f6f2";
@@ -337,7 +360,7 @@
 				// Draw the tile value in the center of the cell
 				var textX = x + (width / 2);
 				var textY = y + (height / 2);
-				context.font = "bold " + Math.floor(Math.min(width, height) / 1.94) + "px Helvetica Neue";
+				context.font = "bold " + Metrics.getTileSize(width, height) + "px Helvetica Neue";
 				context.textAlign = "center";
 				context.textBaseline = "middle";
 				context.fillStyle = FONT_COLOR[tile.value];
@@ -833,7 +856,11 @@
 	var randomTile = function(grid) {
 		var emptyCells = getEmptyCells(grid);
 		var keys = [];
-		for (var key in emptyCells) { keys.push(key); }
+		//noinspection JSHint
+		for (var key in emptyCells) {
+			//noinspection JSUnfilteredForInLoop
+			keys.push(key);
+		}
 
 		// First-level index represents the actual grid-row
 		var row = keys[Math.floor(Math.random() * keys.length)];
@@ -849,7 +876,6 @@
 			triggerGrowth: true,
 			growing: {
 				modifier: "GROW",
-				rate: 5,
 				value: -25,
 				maxSize: 0,
 				minSize: 0
