@@ -44,6 +44,9 @@
 			},
 			getTileSize: function(width, height) {
 				return Math.floor(Math.min(width, height) / 1.94);
+			},
+			getBorder: function() {
+				return this.getSize() / 40;
 			}
 		};
 
@@ -66,6 +69,9 @@
 			},
 			getTileSize: function(width, height) {
 				return Metrics.getTileSize(width, height);
+			},
+			getBorder: function() {
+				return Metrics.getBorder();
 			}
 		};
 	})();
@@ -245,8 +251,8 @@
 				context.fillStyle = "#bbada0";
 				context.fillRect(0, 0, canvas.width, canvas.height);
 
-				var cellHeight = (canvas.height - (grid.border * (grid.height + 1))) / grid.height;
-				var cellWidth = (canvas.width - (grid.border * (grid.width + 1))) / grid.width;
+				var cellHeight = (canvas.height - (Metrics.getBorder() * (grid.height + 1))) / grid.height;
+				var cellWidth = (canvas.width - (Metrics.getBorder() * (grid.width + 1))) / grid.width;
 
 				// Draw the empty cells
 				this.drawCells(context, grid, cellWidth, cellHeight);
@@ -407,8 +413,8 @@
 
 				// Convert the row/column number into x/y coordinates on the actual canvas
 				return {
-					x: (row * cellWidth) + ((row + 1) * grid.border),
-					y: (column * cellHeight) + ((column + 1) * grid.border)
+					x: (row * cellWidth) + ((row + 1) * Metrics.getBorder()),
+					y: (column * cellHeight) + ((column + 1) * Metrics.getBorder())
 				};
 			}
 		};
@@ -930,7 +936,6 @@
 			mergedTiles: [],
 			width: 4,
 			height: 4,
-			border: 15,
 			winningValue: 2048,
 			score: 0
 		};
