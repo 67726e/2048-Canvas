@@ -2,6 +2,7 @@
 (function() {
 	"use strict";
 
+	// TODO: Draw current score & best score UI
 	// TODO: Change animation calculations to include time for non-janky animation
 	// TODO: Make tile font-box slightly smaller than the tile width
 
@@ -21,6 +22,22 @@
 		var body = document.getElementById("body");
 
 		var Metrics = {
+			createCanvas: function(width, height) {
+				// Pixel Density for Devices - http://stackoverflow.com/a/15666143/372743
+				var pixelRatio = this.getPixelRatio();
+				var canvas = document.createElement("canvas");
+				var context = canvas.getContext("2d");
+
+				canvas.width = width * pixelRatio;
+				canvas.height = height * pixelRatio;
+				canvas.style.width = (width + "px");
+				canvas.style.height = (height + "px");
+
+				// Seems to fuck up the iOS UIWebView by quartering the canvas
+//				context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+
+				return canvas;
+			},
 			getPixelRatio: function() {
 				return PIXEL_RATIO;
 			},
@@ -50,6 +67,9 @@
 
 		// public interface
 		return {
+			createCanvas: function(width, height) {
+				return Metrics.createCanvas(width, height);
+			},
 			getPixelRatio: function() {
 				return Metrics.getPixelRatio();
 			},
@@ -908,21 +928,13 @@
 
 	// Initialize game and controls
 	(function() {
-		// Pixel Density for Devices - http://stackoverflow.com/a/15666143/372743
-		var pixelRatio = Metrics.getPixelRatio();
+		// Get the available size for a square canvas
 		var size = Metrics.getSize();
 
+		// Get the main canvas ready
 		var body = document.getElementById("body");
-		var canvas = document.createElement("canvas");
+		var canvas = Metrics.createCanvas(size, size);
 		var context = canvas.getContext("2d");
-
-		canvas.width = size * pixelRatio;
-		canvas.height = size * pixelRatio;
-		canvas.style.width = (size + "px");
-		canvas.style.height = (size + "px");
-
-		// Seems to fuck up the iOS UIWebView by quartering the canvas
-//		context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
 
 		body.appendChild(canvas);
 
