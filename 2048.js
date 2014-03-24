@@ -62,6 +62,12 @@
 			},
 			getBorder: function() {
 				return this.getSize() / 40;
+			},
+			getCellWidth: function(canvas, grid) {
+				return (canvas.width - (Metrics.getBorder() * (grid.width + 1))) / grid.width;
+			},
+			getCellHeight: function(canvas, grid) {
+				return (canvas.height - (this.getBorder() * (grid.height + 1))) / grid.height;
 			}
 		};
 
@@ -90,6 +96,12 @@
 			},
 			getBorder: function() {
 				return Metrics.getBorder();
+			},
+			getCellWidth: function(canvas, grid) {
+				return Metrics.getCellWidth(canvas, grid);
+			},
+			getCellHeight: function(canvas, grid) {
+				return Metrics.getCellHeight(canvas, grid);
 			}
 		};
 	})();
@@ -269,8 +281,8 @@
 				context.fillStyle = "#bbada0";
 				context.fillRect(0, 0, canvas.width, canvas.height);
 
-				var cellHeight = (canvas.height - (Metrics.getBorder() * (grid.height + 1))) / grid.height;
-				var cellWidth = (canvas.width - (Metrics.getBorder() * (grid.width + 1))) / grid.width;
+				var cellHeight = Metrics.getCellHeight(canvas, grid);
+				var cellWidth = Metrics.getCellWidth(canvas, grid);
 
 				// Draw the empty cells
 				this.drawCells(context, grid, cellWidth, cellHeight);
