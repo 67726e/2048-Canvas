@@ -122,19 +122,54 @@
 				event.preventDefault();
 			}
 
-			direction = event.keyCode;
+			direction = KEY_TO_COMMAND[event.keyCode];
 		});
 
 		// Handle touch moves
-		var hammer = new Hammer(document.getElementById("body"));
-		hammer.on("swipeup", function() { direction = "UP"; });
-		hammer.on("swipedown", function() { direction = "DOWN"; });
-		hammer.on("swipeleft", function() { direction = "LEFT"; });
-		hammer.on("swiperight", function() { direction = "RIGHT"; });
+		var startCoordinates = { x: 0, y: 0 };
+		addEventListener("touchstart", function(event) {
+			event.changedTouches = event.changedTouches || [{ pageX: 0, pageY: 0 }];
+			var touch = event.changedTouches[0];
+
+			startCoordinates.x = touch.pageX;
+			startCoordinates.y = touch.pageY;
+		});
+		addEventListener("touchend", function(event) {
+			event.changedTouches = event.changedTouches || [{ pageX: 0, pageY: 0 }];
+			var touch = event.changedTouches[0];
+
+			// Get the horizontal and vertical differences
+			var horizontal = startCoordinates.x - touch.pageX;
+			var vertical = startCoordinates.y - touch.pageY;
+
+			// Clear the start/stop coordinates
+			startCoordinates.x = 0;
+			startCoordinates.y = 0;
+
+			// If the horizontal change was greater than the vertical change, horizontal swipe
+			if (Math.abs(horizontal) > Math.abs(vertical)) {
+				if (horizontal > 0) {
+					// Swiped left
+					direction = "LEFT";
+				} else {
+					// Swiped right
+					direction = "RIGHT";
+				}
+			} else {
+				// Otherwise vertical swipe
+				if (vertical > 0) {
+					// Swiped down
+					direction = "UP";
+				} else {
+					// Swiped up
+					direction = "DOWN";
+				}
+			}
+		});
 
 		var Input = {
 			getCommand: function() {
-				var command = KEY_TO_COMMAND[direction];
+				var command = direction;
 				direction = undefined;
 
 				return command;
