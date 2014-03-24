@@ -990,10 +990,10 @@
 			} else if (Game.hasLost(grid)) {
 				// Draw game over screen
 				Renderer.showGameOver(canvas, context);
-			} else {
-				// Continue running the main loop
-				setTimeout(mainLoop, 25);
 			}
+
+			// Continue running the main loop
+			setTimeout(mainLoop, 25);
 		})();
 	})();
 })();
