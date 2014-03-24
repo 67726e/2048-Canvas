@@ -816,12 +816,18 @@
 
 	var Game = (function() {
 		var Game = {
-			reset: function(grid) {
-				// Set the score
-				grid.score = 0;
-				// Create new set of tiles
-				grid.tiles = [];
-				grid.mergedTiles = [];
+			reset: function() {
+				// tile: {value: 2, x: 0, y: 0} - Includes value and coordinates (redundant, but error correcting)
+				var grid = {
+					// column x row
+					tiles: [],
+					// Used for tiles that are merged but need to be animated
+					mergedTiles: [],
+					width: 4,
+					height: 4,
+					winningValue: 2048,
+					score: 0
+				};
 
 				// Fill the set of tiles as empty
 				for (var x = 0; x < grid.width; x++) {
@@ -839,6 +845,8 @@
 				grid.tiles[firstTile.x][firstTile.y] = firstTile;
 				var secondTile = randomTile(grid);
 				grid.tiles[secondTile.x][secondTile.y] = secondTile;
+
+				return grid;
 			},
 			hasLost: function(grid) {
 				return (!Movement.canMove("UP", grid) && !Movement.canMove("DOWN", grid) && !Movement.canMove("LEFT", grid) &&
@@ -858,8 +866,8 @@
 		};
 
 		return {
-			reset: function(grid) {
-				Game.reset(grid);
+			reset: function() {
+				return Game.reset();
 			},
 			hasLost: function(grid) {
 				return Game.hasLost(grid);
@@ -938,20 +946,8 @@
 
 		body.appendChild(canvas);
 
-		// tile: {value: 2, x: 0, y: 0} - Includes value and coordinates (redundant, but error correcting)
-		var grid = {
-			// column x row
-			tiles: [],
-			// Used for tiles that are merged but need to be animated
-			mergedTiles: [],
-			width: 4,
-			height: 4,
-			winningValue: 2048,
-			score: 0
-		};
-
-		// Initialize game data
-		Game.reset(grid);
+		// Setup game data
+		var grid = Game.reset();
 
 		// Determine if we need a random tile on the next input
 		var insertTile = false;
