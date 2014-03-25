@@ -48,7 +48,7 @@
 				return this.getSize() / 25;
 			},
 			getGrowthSpeed: function() {
-				return this.getSize() / 100;
+				return (this.getSize() / 100) * Metrics.getPixelRatio();
 			},
 			getHeaderSize: function() {
 				return Math.floor(this.getSize() / 8.33);
