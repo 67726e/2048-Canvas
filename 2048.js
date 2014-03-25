@@ -54,6 +54,9 @@
 			getHeaderSize: function() {
 				return Math.floor(this.getSize() / 8.33);
 			},
+			getResetSize: function() {
+				return Math.floor(this.getSize() / 30);
+			},
 			getTileSize: function(width, height) {
 				return Math.floor(Math.min(width, height) / 1.94);
 			},
@@ -99,6 +102,9 @@
 			},
 			getHeaderSize: function() {
 				return Metrics.getHeaderSize();
+			},
+			getResetSize: function() {
+				return Metrics.getResetSize();
 			},
 			getTileSize: function(width, height) {
 				return Metrics.getTileSize(width, height);
@@ -395,10 +401,10 @@
 				context.fillRect(0, 0, canvas.width, canvas.height);
 			},
 			showRestart: function(canvas, context) {
-				// TODO: Show relative to the "Game Over"/"Game Won" message
-				var margin = 10;
-				var buttonWidth = 120;
-				var buttonHeight = 50;
+				var fontSize = Metrics.getResetSize();
+				var buttonWidth = Math.floor(fontSize * 6.67);
+				var buttonHeight = Math.floor(buttonWidth / 2.5);
+				var margin = Math.floor(buttonWidth / 10);
 				var buttonX = (canvas.width / 2) - (buttonWidth / 2);
 				var buttonY = (canvas.height / 2) + 50;
 
@@ -407,7 +413,7 @@
 				this.roundedRectangle(context, buttonX, buttonY, buttonWidth, buttonHeight, 4);
 
 				// Show the message
-				context.font = "bold 18px Helvetica Neue";
+				context.font = "bold " + fontSize + "px Helvetica Neue";
 				context.textAlign = "center";
 				context.textAlign = "middle";
 				context.fillStyle = "rgb(255, 255, 255)";
