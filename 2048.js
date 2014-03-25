@@ -2,9 +2,10 @@
 (function() {
 	"use strict";
 
-	// TODO: Draw current score & best score UI
 	// TODO: Change animation calculations to include time for non-janky animation
 	// TODO: Make tile font-box slightly smaller than the tile width
+	// TODO: Handle save & resume state
+	// TODO: Handle storage of highest score
 
 	var Metrics = (function() {
 		var PIXEL_RATIO = (function () {
