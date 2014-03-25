@@ -5,11 +5,11 @@
 
 #body {
 	background: #faf8ef;
-	text-align: center;
 }
 
-#canvas {
-    cursor: pointer;
-	display: inline-block;
+canvas {
+	display: block;
+	margin: 0 auto;
+	cursor: pointer;
 }
 

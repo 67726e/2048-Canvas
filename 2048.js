@@ -42,11 +42,7 @@
 				return PIXEL_RATIO;
 			},
 			getSize: function() {
-				var e = document.documentElement,
-					width = window.innerWidth || e.clientWidth || body.clientWidth,
-					height = window.innerHeight|| e.clientHeight|| body.clientHeight;
-
-				return Math.min(width, height);
+				return Math.min(this.getWidth(), this.getHeight());
 			},
 			getSlideSpeed: function() {
 				return this.getSize() / 25;
@@ -62,6 +58,18 @@
 			},
 			getBorder: function() {
 				return this.getSize() / 40;
+			},
+			getWidth: function() {
+				var e = document.documentElement,
+					width = window.innerWidth || e.clientWidth || body.clientWidth;
+
+				return width;
+			},
+			getHeight: function() {
+				var e = document.documentElement,
+					height = window.innerHeight|| e.clientHeight|| body.clientHeight;
+
+				return height;
 			},
 			getCellWidth: function(canvas, grid) {
 				return (canvas.width - (Metrics.getBorder() * (grid.width + 1))) / grid.width;
@@ -96,6 +104,12 @@
 			},
 			getBorder: function() {
 				return Metrics.getBorder();
+			},
+			getWidth: function() {
+				return Metrics.getWidth();
+			},
+			getHeight: function() {
+				return Metrics.getHeight();
 			},
 			getCellWidth: function(canvas, grid) {
 				return Metrics.getCellWidth(canvas, grid);
@@ -327,6 +341,10 @@
 				// Draw tiles in their proper cells
 				this.drawTiles(context, grid, cellWidth, cellHeight);
 			},
+			renderScores: function(canvas, context, currentScore, topScore) {
+				var topScoreCoordinates = this.drawTopScore(canvas, context, topScore);
+				this.drawCurrentScore(canvas, context, topScoreCoordinates, currentScore);
+			},
 			showGameOver: function(canvas, context) {
 				this.showOverlay(canvas, context, "rgba(238, 228, 218, 0.5)");
 
@@ -481,6 +499,68 @@
 					x: (row * cellWidth) + ((row + 1) * Metrics.getBorder()),
 					y: (column * cellHeight) + ((column + 1) * Metrics.getBorder())
 				};
+			},
+
+
+			drawCurrentScore: function(canvas, context, topScoreCoordinates, score) {
+				// TODO: Use font-metrics to determine size/positioning
+				var margin = 10;
+				var width = 150;
+				var height = canvas.height - (margin * 2);
+				var x = topScoreCoordinates.x - (width + margin);
+				var y = margin;
+
+				// Draw the score box
+				context.fillStyle = "rgb(186, 173, 160)";
+				this.roundedRectangle(context, x, y, width, height, 4);
+
+				// Draw the "Score:" label
+				context.fillStyle = "rgb(237, 228, 218)";
+				context.font = "bold 16px Helvetica Neue";
+				context.textAlign = "center";
+				context.textBaseline = "top";
+				context.fillText("Score:", x + (width / 2), y + 5, width);
+
+				// Draw the current score
+				context.fillStyle = "rgb(255, 255, 255)";
+				context.font = "bold 28px Helvetica Neue";
+				context.textBaseline = "bottom";
+				context.fillText(score, x + (width / 2), y + height - 5, width);
+
+				return {
+					x: 0,
+					y: 0
+				};
+			},
+			drawTopScore: function(canvas, context, score) {
+				// TODO: Use font-metrics to determine size/positioning
+				var margin = 10;
+				var width = 150;
+				var height = canvas.height - (margin * 2);
+				var x = canvas.width - width;
+				var y = margin;
+
+				// Draw the top score box
+				context.fillStyle = "rgb(186, 173, 160)";
+				this.roundedRectangle(context, x, y, width, height, 4);
+
+				// Draw the "Top Score:" text
+				context.fillStyle = "rgb(237, 228, 218)";
+				context.font = "bold 16px Helvetica Neue";
+				context.textAlign = "center";
+				context.textBaseline = "top";
+				context.fillText("Top Score:", x + (width / 2), y + 5, width);
+
+				// Draw the score under the heading
+				context.fillStyle = "rgb(255, 255, 255)";
+				context.font = "bold 28px Helvetica Neue";
+				context.textBaseline = "bottom";
+				context.fillText(score, x + (width / 2), y + height - 5, width);
+
+				return {
+					x: x,
+					y: y
+				};
 			}
 		};
 
@@ -488,6 +568,9 @@
 		return {
 			render: function(canvas, context, grid) {
 				return Renderer.render(canvas, context, grid);
+			},
+			renderScores: function(canvas, context, currentScore, topScore) {
+				return Renderer.renderScores(canvas, context, currentScore, topScore);
 			},
 			showGameOver: function(canvas, context) {
 				Renderer.showGameOver(canvas, context);
@@ -984,14 +1067,21 @@
 	// Initialize game and controls
 	(function() {
 		// Get the available size for a square canvas
+		var scoreCanvasHeight = 80;
 		var size = Metrics.getSize();
+		size = ((Metrics.getHeight() - scoreCanvasHeight) <= Metrics.getWidth()) ? (Metrics.getHeight() - scoreCanvasHeight) : size;
+
+		var body = document.getElementById("body");
+
+		// Get the score canvas ready
+		var scoreCanvas = Metrics.createCanvas(size, scoreCanvasHeight);
+		var scoreContext = scoreCanvas.getContext("2d");
+		body.appendChild(scoreCanvas);
 
 		// Get the main canvas ready
-		var body = document.getElementById("body");
-		var canvas = Metrics.createCanvas(size, size);
-		var context = canvas.getContext("2d");
-
-		body.appendChild(canvas);
+		var gameCanvas = Metrics.createCanvas(size, size);
+		var gameContext = gameCanvas.getContext("2d");
+		body.appendChild(gameCanvas);
 
 		// Setup game data
 		var grid = Game.reset();
@@ -1002,7 +1092,7 @@
 		// Setup the render loop
 		(function mainLoop() {
 			// Handle calculations for animations
-			var blockInput = Animation.animate(canvas, context, grid);
+			var blockInput = Animation.animate(gameCanvas, gameContext, grid);
 
 			// Handle the user input
 			if (!blockInput) {
@@ -1024,15 +1114,18 @@
 			}
 
 			// Draw the game screen
-			Renderer.render(canvas, context, grid);
+			Renderer.render(gameCanvas, gameContext, grid);
+			// Draw the scores
+			// TODO: Keep track of best score, somehow
+			Renderer.renderScores(scoreCanvas, scoreContext, grid.score, 0);
 
 			// Check if we need to continue playing
 			if (Game.hasWon(grid)) {
 				// Draw the game won screen
-				Renderer.showGameWon(canvas, context);
+				Renderer.showGameWon(gameCanvas, gameContext);
 			} else if (Game.hasLost(grid)) {
 				// Draw game over screen
-				Renderer.showGameOver(canvas, context);
+				Renderer.showGameOver(gameCanvas, gameContext);
 			}
 
 			// Continue running the main loop
