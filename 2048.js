@@ -1067,7 +1067,7 @@
 	// Initialize game and controls
 	(function() {
 		// Get the available size for a square canvas
-		var scoreCanvasHeight = 80;
+		var scoreCanvasHeight = 80 / Metrics.getPixelRatio();
 		var size = Metrics.getSize();
 		size = ((Metrics.getHeight() - scoreCanvasHeight) <= Metrics.getWidth()) ? (Metrics.getHeight() - scoreCanvasHeight) : size;
 
