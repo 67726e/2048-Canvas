@@ -356,7 +356,8 @@
 				context.fillStyle = "#776e65";
 				context.fillText("Game Over!", (canvas.width / 2), (canvas.height / 2), canvas.width);
 
-				// TODO: Draw "Try again" button
+				// Draw "Try again" button
+				this.showRestart(canvas, context);
 			},
 			showGameWon: function(canvas, context) {
 				this.showOverlay(canvas, context, "rgba(237, 194, 46, 0.5)");
@@ -368,7 +369,8 @@
 				context.fillStyle = "#f9f6f2";
 				context.fillText("You win!", (canvas.width / 2), (canvas.height / 2), canvas.width);
 
-				// TODO: Add "Try Again" button
+				// Add "Try Again" button
+				this.showRestart(canvas, context);
 			},
 
 			roundedRectangle: function(context, x, y, width, height, radius) {
@@ -391,6 +393,25 @@
 				// Draw semi-transparent background over the entire grid
 				context.fillStyle = fill;
 				context.fillRect(0, 0, canvas.width, canvas.height);
+			},
+			showRestart: function(canvas, context) {
+				// TODO: Show relative to the "Game Over"/"Game Won" message
+				var margin = 10;
+				var buttonWidth = 120;
+				var buttonHeight = 50;
+				var buttonX = (canvas.width / 2) - (buttonWidth / 2);
+				var buttonY = (canvas.height / 2) + 50;
+
+				// Draw the rectangle button
+				context.fillStyle = "rgb(143, 122, 102)";
+				this.roundedRectangle(context, buttonX, buttonY, buttonWidth, buttonHeight, 4);
+
+				// Show the message
+				context.font = "bold 18px Helvetica Neue";
+				context.textAlign = "center";
+				context.textAlign = "middle";
+				context.fillStyle = "rgb(255, 255, 255)";
+				context.fillText("Play Again?", buttonX + (buttonWidth / 2), buttonY + (buttonHeight / 2), buttonWidth - (margin * 2));
 			},
 			drawCells: function(context, grid, cellWidth, cellHeight) {
 				for (var x = 0; x < grid.width; x++) {
@@ -501,7 +522,6 @@
 					y: (column * cellHeight) + ((column + 1) * Metrics.getBorder())
 				};
 			},
-
 
 			drawCurrentScore: function(canvas, context, topScoreCoordinates, score) {
 				// TODO: Use font-metrics to determine size/positioning
