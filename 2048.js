@@ -149,6 +149,9 @@
 		// Handle touch moves
 		var startCoordinates = { x: 0, y: 0 };
 		addEventListener("touchstart", function(event) {
+			// Needed to prevent undefined behavior on Android devices
+			event.preventDefault();
+			
 			event.changedTouches = event.changedTouches || [{ pageX: 0, pageY: 0 }];
 			var touch = event.changedTouches[0];
 
@@ -156,6 +159,9 @@
 			startCoordinates.y = touch.pageY;
 		});
 		addEventListener("touchend", function(event) {
+			// Needed to prevent undefined behavior on Android devices
+			event.preventDefault();
+
 			event.changedTouches = event.changedTouches || [{ pageX: 0, pageY: 0 }];
 			var touch = event.changedTouches[0];
 
