@@ -46,10 +46,10 @@
 				return Math.min(this.getWidth(), this.getHeight());
 			},
 			getSlideSpeed: function() {
-				return this.getSize() / 25;
+				return (this.getSize() / 25) * this.getPixelRatio();
 			},
 			getGrowthSpeed: function() {
-				return (this.getSize() / 100) * Metrics.getPixelRatio();
+				return (this.getSize() / 100) * this.getPixelRatio();
 			},
 			getHeaderSize: function() {
 				return Math.floor(this.getSize() / 8.33);
