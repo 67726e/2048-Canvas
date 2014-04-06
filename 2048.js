@@ -52,16 +52,16 @@
 				return (this.getSize() / 100) * this.getPixelRatio();
 			},
 			getHeaderSize: function() {
-				return Math.floor(this.getSize() / 8.33);
+				return Math.floor(this.getSize() / 8.33) * this.getPixelRatio();
 			},
 			getResetSize: function() {
-				return Math.floor(this.getSize() / 30);
+				return Math.floor(this.getSize() / 30) * this.getPixelRatio();
 			},
 			getTileSize: function(width, height) {
 				return Math.floor(Math.min(width, height) / 1.94);
 			},
 			getBorder: function() {
-				return this.getSize() / 40;
+				return (this.getSize() / 40) * this.getPixelRatio();
 			},
 			getWidth: function() {
 				var e = document.documentElement,
@@ -538,7 +538,7 @@
 			drawCurrentScore: function(canvas, context, topScoreCoordinates, score) {
 				// TODO: Use font-metrics to determine size/positioning
 				var margin = 10;
-				var width = 150;
+				var width = 180;
 				var height = canvas.height - (margin * 2);
 				var x = topScoreCoordinates.x - (width + margin);
 				var y = margin;
@@ -549,14 +549,14 @@
 
 				// Draw the "Score:" label
 				context.fillStyle = "rgb(237, 228, 218)";
-				context.font = "bold 16px Helvetica Neue";
+				context.font = "bold 24px Helvetica Neue";
 				context.textAlign = "center";
 				context.textBaseline = "top";
 				context.fillText("Score:", x + (width / 2), y + 5, width);
 
 				// Draw the current score
 				context.fillStyle = "rgb(255, 255, 255)";
-				context.font = "bold 28px Helvetica Neue";
+				context.font = "bold 36px Helvetica Neue";
 				context.textBaseline = "bottom";
 				context.fillText(score, x + (width / 2), y + height - 5, width);
 
@@ -568,7 +568,7 @@
 			drawTopScore: function(canvas, context, score) {
 				// TODO: Use font-metrics to determine size/positioning
 				var margin = 10;
-				var width = 150;
+				var width = 180;
 				var height = canvas.height - (margin * 2);
 				var x = canvas.width - width;
 				var y = margin;
@@ -579,14 +579,14 @@
 
 				// Draw the "Top Score:" text
 				context.fillStyle = "rgb(237, 228, 218)";
-				context.font = "bold 16px Helvetica Neue";
+				context.font = "bold 24px Helvetica Neue";
 				context.textAlign = "center";
 				context.textBaseline = "top";
 				context.fillText("Top Score:", x + (width / 2), y + 5, width);
 
 				// Draw the score under the heading
 				context.fillStyle = "rgb(255, 255, 255)";
-				context.font = "bold 28px Helvetica Neue";
+				context.font = "bold 36px Helvetica Neue";
 				context.textBaseline = "bottom";
 				context.fillText(score, x + (width / 2), y + height - 5, width);
 
@@ -1100,7 +1100,7 @@
 	// Initialize game and controls
 	(function() {
 		// Get the available size for a square canvas
-		var scoreCanvasHeight = 80 / Metrics.getPixelRatio();
+		var scoreCanvasHeight = 100 / Metrics.getPixelRatio();
 		var size = Metrics.getSize();
 		size = ((Metrics.getHeight() - scoreCanvasHeight) <= Metrics.getWidth()) ? (Metrics.getHeight() - scoreCanvasHeight) : size;
 
@@ -1153,7 +1153,7 @@
 			Renderer.renderScores(scoreCanvas, scoreContext, grid.score, 0);
 
 			// Check if we need to continue playing
-			if (Game.hasWon(grid)) {
+			if (true || Game.hasWon(grid)) {
 				// Draw the game won screen
 				Renderer.showGameWon(gameCanvas, gameContext);
 			} else if (Game.hasLost(grid)) {
