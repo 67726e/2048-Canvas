@@ -11,5 +11,9 @@ canvas {
 	display: block;
 	margin: 0 auto;
 	cursor: pointer;
+
+	/* Disable Android touch highlight - http://stackoverflow.com/a/13255856/372743 */
+	-webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+	-webkit-user-modify: read-write-plaintext-only;
 }
 
