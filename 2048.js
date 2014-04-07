@@ -200,6 +200,21 @@
 				direction = undefined;
 
 				return command;
+			},
+			oneClick: function(callback) {
+				var immediateCallback = function(event) {
+					event.preventDefault();
+
+					// Remove the event listeners
+					removeEventListener("click", immediateCallback);
+					removeEventListener("touchend", immediateCallback);
+
+					// Execute the callback
+					callback();
+				};
+
+				addEventListener("click", immediateCallback);
+				addEventListener("touchend", immediateCallback);
 			}
 		};
 
@@ -207,6 +222,9 @@
 		return {
 			getCommand: function() {
 				return Input.getCommand();
+			},
+			oneClick: function(callback) {
+				Input.oneClick(callback);
 			}
 		};
 	})();
@@ -1122,6 +1140,11 @@
 		// Determine if we need a random tile on the next input
 		var insertTile = false;
 
+		// Callback to reset the game data
+		var resetCallback = function() {
+			grid = Game.reset();
+		};
+
 		// Setup the render loop
 		(function mainLoop() {
 			// Handle calculations for animations
@@ -1156,9 +1179,13 @@
 			if (Game.hasWon(grid)) {
 				// Draw the game won screen
 				Renderer.showGameWon(gameCanvas, gameContext);
+				// Allow the user to restart by tapping the screen
+				Input.oneClick(resetCallback);
 			} else if (Game.hasLost(grid)) {
 				// Draw game over screen
 				Renderer.showGameOver(gameCanvas, gameContext);
+				// Allow the user to restart by tapping the screen
+				Input.oneClick(resetCallback);
 			}
 
 			// Continue running the main loop
