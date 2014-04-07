@@ -1153,7 +1153,7 @@
 			Renderer.renderScores(scoreCanvas, scoreContext, grid.score, 0);
 
 			// Check if we need to continue playing
-			if (true || Game.hasWon(grid)) {
+			if (Game.hasWon(grid)) {
 				// Draw the game won screen
 				Renderer.showGameWon(gameCanvas, gameContext);
 			} else if (Game.hasLost(grid)) {
