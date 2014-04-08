@@ -1147,20 +1147,14 @@
 		var topScore = 0;
 		// Determine if we need a random tile on the next input
 		var insertTile = false;
+		// Determine if the game should be reset
+		var allowReset = true;
 
-		// TODO: Inspect the control flow to ensure all data is reset to the correct state
 		// Callback to reset the game data
-		var addResetCallback = function() {
-			var resetCallback = function() {
-				insertTile = false;
-				grid = Game.reset();
-			};
-
-			// Add the listener after a second to allow the user to notice the screen
-			setTimeout(function() {
-				// Allow the user to restart by tapping the screen
-				Input.resetClick(resetCallback);
-			}, 250);
+		var resetCallback = function() {
+			allowReset = true;
+			insertTile = false;
+			grid = Game.reset();
 		};
 
 		// Setup the render loop
@@ -1197,17 +1191,23 @@
 			// Draw the scores
 			Renderer.renderScores(scoreCanvas, scoreContext, grid.score, topScore);
 
-			// Check if we need to continue playing
-			if (Game.hasWon(grid)) {
-				// Draw the game won screen
-				Renderer.showGameWon(gameCanvas, gameContext);
-				// Allow user to restart
-				addResetCallback();
-			} else if (Game.hasLost(grid)) {
-				// Draw game over screen
-				Renderer.showGameOver(gameCanvas, gameContext);
-				// Allow user to restart
-				addResetCallback();
+			// Check if we should continue playing
+			var hasWon = Game.hasWon(grid);
+			var hasLost = Game.hasLost(grid);
+			if (hasWon || hasLost) {
+				if (allowReset) {
+					// Allow user to restart
+					Input.resetClick(resetCallback);
+					allowReset = false;
+				}
+
+				if (hasWon) {
+					// Draw the game won screen
+					Renderer.showGameWon(gameCanvas, gameContext);
+				} else {
+					// Draw game over screen
+					Renderer.showGameOver(gameCanvas, gameContext);
+				}
 			}
 
 			// Continue running the main loop
