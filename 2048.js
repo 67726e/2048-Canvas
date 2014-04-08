@@ -1148,11 +1148,11 @@
 		// Determine if we need a random tile on the next input
 		var insertTile = false;
 		// Determine if the game should be reset
-		var allowReset = true;
+		var allowResetCallback = true;
 
 		// Callback to reset the game data
 		var resetCallback = function() {
-			allowReset = true;
+			allowResetCallback = true;
 			insertTile = false;
 			grid = Game.reset();
 		};
