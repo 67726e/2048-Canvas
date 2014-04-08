@@ -1115,7 +1115,7 @@
 
 
 
-	var Application = (function() {
+	window.Application = (function() {
 		// Canvases and the assosciated 2D contexts
 		var gameCanvas, gameContext, scoreCanvas, scoreContext;
 		// Setup DOM with canvases
@@ -1219,13 +1219,22 @@
 			setTimeout(mainLoop, 25);
 		})();
 
+		var Application = {
+			save: function() {
+				return JSON.stringify(game);
+			},
+			resume: function(state) {
+				game = JSON.parse(state);
+			}
+		};
+
 		// Public interface
 		return {
 			save: function() {
-				return game;
+				return Application.save();
 			},
 			resume: function(state) {
-				game = state;
+				return Application.resume(state);
 			}
 		};
 	})();
