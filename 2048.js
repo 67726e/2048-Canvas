@@ -1116,11 +1116,9 @@
 
 
 
-	// Initialize game and controls
-	(function() {
+	var Application = (function() {
 		// Canvases and the assosciated 2D contexts
 		var gameCanvas, gameContext, scoreCanvas, scoreContext;
-
 		// Setup DOM with canvases
 		(function() {
 			// Get the available size for a square canvas
@@ -1142,63 +1140,71 @@
 			body.appendChild(gameCanvas);
 		})();
 
-		// Setup game data
-		var grid = Game.reset();
-		var topScore = 0;
-		// Determine if we need a random tile on the next input
-		var insertTile = false;
-		// Determine if the game should be reset
-		var allowResetCallback = true;
+		// Initialize application data
+		var game = {
+			grid: Game.reset(),
+			data: {
+				// Keep track of the current score
+				score: 0,
+				// Keep track of the top score
+				topScore: 0,
+				// Determine if we need a random tile on the next input
+				insertTile: false,
+				// Determine if we are allowed to attach the reset game click handlers
+				allowResetCallback: true
+			}
+		};
 
 		// Callback to reset the game data
 		var resetCallback = function() {
-			allowResetCallback = true;
-			insertTile = false;
-			grid = Game.reset();
+			game.data.score = 0;
+			game.data.allowResetCallback = true;
+			game.data.insertTile = false;
+			game.data.grid = Game.reset();
 		};
 
 		// Setup the render loop
 		(function mainLoop() {
 			// Handle calculations for animations
-			var blockInput = Animation.animate(gameCanvas, gameContext, grid);
+			var blockInput = Animation.animate(gameCanvas, gameContext, game.grid);
 
 			// Handle the user input
 			if (!blockInput) {
 				// Insert a new random tile if needed
-				if (insertTile) {
-					insertTile = false;
-					var tile = randomTile(grid);
-					grid.tiles[tile.x][tile.y] = tile;
+				if (game.data.insertTile) {
+					game.data.insertTile = false;
+					var tile = randomTile(game.grid);
+					game.grid.tiles[tile.x][tile.y] = tile;
 				} else {
 					// Allow the user to move tiles
-					var score = Movement.move(Input.getCommand(), grid);
+					var score = Movement.move(Input.getCommand(), game.grid);
 					if (!!score) {
 						// Update the score
-						grid.score += score.score;
+						game.data.score += score.score;
 						// If we've moved successfully, set a new tile for insertion
-						insertTile = true;
+						game.data.insertTile = true;
 
 						// Update the top score to the appropriate final score
-						if (grid.score > topScore) {
-							topScore = grid.score;
+						if (game.data.score > game.data.topScore) {
+							game.data.topScore = game.data.score;
 						}
 					}
 				}
 			}
 
 			// Draw the game screen
-			Renderer.render(gameCanvas, gameContext, grid);
+			Renderer.render(gameCanvas, gameContext, game.grid);
 			// Draw the scores
-			Renderer.renderScores(scoreCanvas, scoreContext, grid.score, topScore);
+			Renderer.renderScores(scoreCanvas, scoreContext, game.data.score, game.data.topScore);
 
 			// Check if we should continue playing
-			var hasWon = Game.hasWon(grid);
-			var hasLost = Game.hasLost(grid);
+			var hasWon = Game.hasWon(game.grid);
+			var hasLost = Game.hasLost(game.grid);
 			if (hasWon || hasLost) {
-				if (allowReset) {
+				if (game.data.allowResetCallback) {
 					// Allow user to restart
 					Input.resetClick(resetCallback);
-					allowReset = false;
+					game.data.allowResetCallback = false;
 				}
 
 				if (hasWon) {
@@ -1213,6 +1219,16 @@
 			// Continue running the main loop
 			setTimeout(mainLoop, 25);
 		})();
+
+		// Public interface
+		return {
+			save: function() {
+
+			},
+			resume: function(state) {
+
+			}
+		};
 	})();
 })();
 
