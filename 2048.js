@@ -201,7 +201,7 @@
 
 				return command;
 			},
-			oneClick: function(callback) {
+			resetClick: function(callback) {
 				var immediateCallback = function(event) {
 					event.preventDefault();
 
@@ -223,8 +223,8 @@
 			getCommand: function() {
 				return Input.getCommand();
 			},
-			oneClick: function(callback) {
-				Input.oneClick(callback);
+			resetClick: function(callback) {
+				Input.resetClick(callback);
 			}
 		};
 	})();
@@ -1115,29 +1115,36 @@
 
 
 
+
 	// Initialize game and controls
 	(function() {
-		// Get the available size for a square canvas
-		var scoreCanvasHeight = 100 / Metrics.getPixelRatio();
-		var size = Metrics.getSize();
-		size = ((Metrics.getHeight() - scoreCanvasHeight) <= Metrics.getWidth()) ? (Metrics.getHeight() - scoreCanvasHeight) : size;
+		// Canvases and the assosciated 2D contexts
+		var gameCanvas, gameContext, scoreCanvas, scoreContext;
 
-		var body = document.getElementById("body");
+		// Setup DOM with canvases
+		(function() {
+			// Get the available size for a square canvas
+			var scoreCanvasHeight = 100 / Metrics.getPixelRatio();
+			var size = Metrics.getSize();
+			size = ((Metrics.getHeight() - scoreCanvasHeight) <= Metrics.getWidth()) ? (Metrics.getHeight() - scoreCanvasHeight) : size;
 
-		// Get the score canvas ready
-		var scoreCanvas = Metrics.createCanvas(size, scoreCanvasHeight);
-		var scoreContext = scoreCanvas.getContext("2d");
-		body.appendChild(scoreCanvas);
+			// Get the score canvas ready
+			scoreCanvas = Metrics.createCanvas(size, scoreCanvasHeight);
+			scoreContext = scoreCanvas.getContext("2d");
 
-		// Get the main canvas ready
-		var gameCanvas = Metrics.createCanvas(size, size);
-		var gameContext = gameCanvas.getContext("2d");
-		body.appendChild(gameCanvas);
+			// Get the main canvas ready
+			gameCanvas = Metrics.createCanvas(size, size);
+			gameContext = gameCanvas.getContext("2d");
+
+			// Append the canvases to the DOM
+			var body = document.getElementById("body");
+			body.appendChild(scoreCanvas);
+			body.appendChild(gameCanvas);
+		})();
 
 		// Setup game data
 		var grid = Game.reset();
 		var topScore = 0;
-
 		// Determine if we need a random tile on the next input
 		var insertTile = false;
 
@@ -1145,14 +1152,15 @@
 		// Callback to reset the game data
 		var addResetCallback = function() {
 			var resetCallback = function() {
+				insertTile = false;
 				grid = Game.reset();
 			};
 
 			// Add the listener after a second to allow the user to notice the screen
 			setTimeout(function() {
 				// Allow the user to restart by tapping the screen
-				Input.oneClick(resetCallback);
-			}, 500);
+				Input.resetClick(resetCallback);
+			}, 250);
 		};
 
 		// Setup the render loop
