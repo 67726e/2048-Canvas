@@ -1006,8 +1006,7 @@
 					mergedTiles: [],
 					width: 4,
 					height: 4,
-					winningValue: 2048,
-					score: 0
+					winningValue: 2048
 				};
 
 				// Fill the set of tiles as empty
@@ -1160,7 +1159,7 @@
 			game.data.score = 0;
 			game.data.allowResetCallback = true;
 			game.data.insertTile = false;
-			game.data.grid = Game.reset();
+			game.grid = Game.reset();
 		};
 
 		// Setup the render loop
@@ -1223,10 +1222,10 @@
 		// Public interface
 		return {
 			save: function() {
-
+				return game;
 			},
 			resume: function(state) {
-
+				game = state;
 			}
 		};
 	})();
