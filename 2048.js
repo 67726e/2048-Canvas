@@ -1162,6 +1162,9 @@
 			game.grid = Game.reset();
 		};
 
+		// List of callbacks to be executed when the game finishes
+		var gameFinishedCallbacks = [];
+
 		// Setup the render loop
 		(function mainLoop() {
 			// Handle calculations for animations
@@ -1203,6 +1206,13 @@
 				if (game.data.allowResetCallback) {
 					// Allow user to restart
 					Input.resetClick(resetCallback);
+
+					// Execute all callbacks, passing in the top score
+					for (var i = 0; i < gameFinishedCallbacks.length; i++) {
+						var callback = gameFinishedCallbacks[i];
+						callback.callback.call(callback.context, game.data.topScore);
+					}
+
 					game.data.allowResetCallback = false;
 				}
 
@@ -1225,6 +1235,9 @@
 			},
 			resume: function(state) {
 				game = JSON.parse(state);
+			},
+			onGameFinished: function(callback, context) {
+				gameFinishedCallbacks.push({ callback: callback, context: context });
 			}
 		};
 
@@ -1235,6 +1248,9 @@
 			},
 			resume: function(state) {
 				return Application.resume(state);
+			},
+			onGameFinished: function(callback, context) {
+				return Application.onGameFinished(callback, context);
 			}
 		};
 	})();
