@@ -521,7 +521,8 @@
 				context.textAlign = "center";
 				context.textBaseline = "middle";
 				context.fillStyle = FONT_COLOR[tile.value];
-				context.fillText(tile.value, textX, textY, width);
+				// Allow for 10px of padding on the bounding box
+				context.fillText(tile.value, textX, textY, width - 10);
 			},
 			drawMergedTiles: function(context, grid, cellWidth, cellHeight) {
 				// Iterate over the merged tiles and draw them on screen
