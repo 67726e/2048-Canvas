@@ -1,3 +1,4 @@
+/*global GameAssets: true */
 
 (function() {
 	"use strict";
@@ -325,37 +326,12 @@
 	})();
 
 	var Renderer = (function() {
-		var BACKGROUND_COLOR = {
-			"2": "#eee4da",
-			"4": "#ede0c8",
-			"8": "#f2b179",
-			"16": "#f59563",
-			"32": "#f67c5f",
-			"64": "#f65e3b",
-			"128": "#edcf72",
-			"256": "#edcc61",
-			"512": "#edc850",
-			"1024": "#edc53f",
-			"2048": "#edc22e"
-		};
-		var FONT_COLOR = {
-			"2": "#776e65",
-			"4": "#776e65",
-			"8": "#f9f6f2",
-			"16": "#f9f6f2",
-			"32": "#f9f6f2",
-			"64": "#f9f6f2",
-			"128": "#f9f6f2",
-			"256": "#f9f6f2",
-			"512": "#f9f6f2",
-			"1024": "#f9f6f2",
-			"2048": "#f9f6f2"
-		};
+		var assets = GameAssets.getClassicPackage();
 
 		var Renderer = {
 			render: function(canvas, context, grid) {
 				// Draw the background
-				context.fillStyle = "#bbada0";
+				context.fillStyle = assets.backgroundColor;
 				context.fillRect(0, 0, canvas.width, canvas.height);
 
 				var cellHeight = Metrics.getCellHeight(canvas, grid);
@@ -374,26 +350,26 @@
 				this.drawCurrentScore(canvas, context, topScoreCoordinates, currentScore);
 			},
 			showGameOver: function(canvas, context) {
-				this.showOverlay(canvas, context, "rgba(238, 228, 218, 0.5)");
+				this.showOverlay(canvas, context, assets.gameOver.backgroundColor);
 
 				// Draw "Game Over!" text
 				context.font = "bold " + Metrics.getHeaderSize() + "px Helvetica Neue";
 				context.textAlign = "center";
 				context.textBaseline = "middle";
-				context.fillStyle = "#776e65";
+				context.fillStyle = assets.gameOver.textColor;
 				context.fillText("Game Over!", (canvas.width / 2), (canvas.height / 2), canvas.width);
 
 				// Draw "Try again" button
 				this.showRestart(canvas, context);
 			},
 			showGameWon: function(canvas, context) {
-				this.showOverlay(canvas, context, "rgba(237, 194, 46, 0.5)");
+				this.showOverlay(canvas, context, assets.gameWon.backgroundColor);
 
 				// Draw "Game Won!" message
 				context.font = "bold " + Metrics.getHeaderSize() + "px Helvetica Neue";
 				context.textAlign = "center";
 				context.textBaseline = "middle";
-				context.fillStyle = "#f9f6f2";
+				context.fillStyle = assets.gameWon.textColor;
 				context.fillText("You win!", (canvas.width / 2), (canvas.height / 2), canvas.width);
 
 				// Add "Try Again" button
@@ -430,14 +406,14 @@
 				var buttonY = (canvas.height / 2) + 50;
 
 				// Draw the rectangle button
-				context.fillStyle = "rgb(143, 122, 102)";
+				context.fillStyle = assets.restart.backgroundColor;
 				this.roundedRectangle(context, buttonX, buttonY, buttonWidth, buttonHeight, 4);
 
 				// Show the message
 				context.font = "bold " + fontSize + "px Helvetica Neue";
 				context.textAlign = "center";
 				context.textAlign = "middle";
-				context.fillStyle = "rgb(255, 255, 255)";
+				context.fillStyle = assets.restart.textColor;
 				context.fillText("Play Again?", buttonX + (buttonWidth / 2), buttonY + (buttonHeight / 2), buttonWidth - (margin * 2));
 			},
 			drawCells: function(context, grid, cellWidth, cellHeight) {
@@ -449,7 +425,7 @@
 				}
 			},
 			drawCell: function(context, coordinates, width, height) {
-				context.fillStyle = "rgba(238, 228, 218, 0.35)";
+				context.fillStyle = assets.cellBackgroundColor;
 				this.roundedRectangle(context, coordinates.x, coordinates.y, width, height, 5);
 			},
 			drawTiles: function(context, grid, cellWidth, cellHeight) {
@@ -508,7 +484,7 @@
 				}
 
 				// Fill in the cell with the proper background color
-				context.fillStyle = BACKGROUND_COLOR[tile.value];
+				context.fillStyle = assets.tileBackgroundColor[tile.value];
 				this.roundedRectangle(context, x, y, width, height, 5);
 
 				// Draw the tile value in the center of the cell
@@ -517,7 +493,7 @@
 				context.font = "bold " + Metrics.getTileSize(width, height) + "px Helvetica Neue";
 				context.textAlign = "center";
 				context.textBaseline = "middle";
-				context.fillStyle = FONT_COLOR[tile.value];
+				context.fillStyle = assets.tileTextColor[tile.value];
 				// Allow for 10px of padding on the bounding box
 				context.fillText(tile.value, textX, textY, width - 10);
 			},
@@ -560,18 +536,18 @@
 				var y = margin;
 
 				// Draw the score box
-				context.fillStyle = "rgb(186, 173, 160)";
+				context.fillStyle = assets.score.backgroundColor;
 				this.roundedRectangle(context, x, y, width, height, 4);
 
 				// Draw the "Score:" label
-				context.fillStyle = "rgb(237, 228, 218)";
+				context.fillStyle = assets.score.titleColor;
 				context.font = "bold 24px Helvetica Neue";
 				context.textAlign = "center";
 				context.textBaseline = "top";
 				context.fillText("Score:", x + (width / 2), y + 5, width);
 
 				// Draw the current score
-				context.fillStyle = "rgb(255, 255, 255)";
+				context.fillStyle = assets.score.valueColor;
 				context.font = "bold 36px Helvetica Neue";
 				context.textBaseline = "bottom";
 				context.fillText(score, x + (width / 2), y + height - 5, width);
@@ -590,18 +566,18 @@
 				var y = margin;
 
 				// Draw the top score box
-				context.fillStyle = "rgb(186, 173, 160)";
+				context.fillStyle = assets.score.backgroundColor;
 				this.roundedRectangle(context, x, y, width, height, 4);
 
 				// Draw the "Top Score:" text
-				context.fillStyle = "rgb(237, 228, 218)";
+				context.fillStyle = assets.score.titleColor;
 				context.font = "bold 24px Helvetica Neue";
 				context.textAlign = "center";
 				context.textBaseline = "top";
 				context.fillText("Top Score:", x + (width / 2), y + 5, width);
 
 				// Draw the score under the heading
-				context.fillStyle = "rgb(255, 255, 255)";
+				context.fillStyle = assets.score.valueColor;
 				context.font = "bold 36px Helvetica Neue";
 				context.textBaseline = "bottom";
 				context.fillText(score, x + (width / 2), y + height - 5, width);
