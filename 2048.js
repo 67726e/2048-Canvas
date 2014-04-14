@@ -1230,6 +1230,9 @@
 		})();
 
 		var Application = {
+			restart: function() {
+				resetCallback();
+			},
 			save: function() {
 				return JSON.stringify(game);
 			},
@@ -1243,6 +1246,9 @@
 
 		// Public interface
 		return {
+			restart: function() {
+				return Application.restart();
+			},
 			save: function() {
 				return Application.save();
 			},
