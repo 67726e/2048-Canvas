@@ -1144,30 +1144,6 @@
 			// Handle calculations for animations
 			var blockInput = Animation.animate(gameCanvas, gameContext, game.grid);
 
-			// Handle the user input
-			if (!blockInput) {
-				// Insert a new random tile if needed
-				if (game.data.insertTile) {
-					game.data.insertTile = false;
-					var tile = randomTile(game.grid);
-					game.grid.tiles[tile.x][tile.y] = tile;
-				} else {
-					// Allow the user to move tiles
-					var score = Movement.move(Input.getCommand(), game.grid);
-					if (!!score) {
-						// Update the score
-						game.data.score += score.score;
-						// If we've moved successfully, set a new tile for insertion
-						game.data.insertTile = true;
-
-						// Update the top score to the appropriate final score
-						if (game.data.score > game.data.topScore) {
-							game.data.topScore = game.data.score;
-						}
-					}
-				}
-			}
-
 			// Draw the game screen
 			Renderer.render(gameCanvas, gameContext, game.grid);
 			// Draw the scores
@@ -1196,6 +1172,30 @@
 				} else {
 					// Draw game over screen
 					Renderer.showGameOver(gameCanvas, gameContext);
+				}
+			} else {
+				// Handle the user input
+				if (!blockInput) {
+					// Insert a new random tile if needed
+					if (game.data.insertTile) {
+						game.data.insertTile = false;
+						var tile = randomTile(game.grid);
+						game.grid.tiles[tile.x][tile.y] = tile;
+					} else {
+						// Allow the user to move tiles
+						var score = Movement.move(Input.getCommand(), game.grid);
+						if (!!score) {
+							// Update the score
+							game.data.score += score.score;
+							// If we've moved successfully, set a new tile for insertion
+							game.data.insertTile = true;
+
+							// Update the top score to the appropriate final score
+							if (game.data.score > game.data.topScore) {
+								game.data.topScore = game.data.score;
+							}
+						}
+					}
 				}
 			}
 
